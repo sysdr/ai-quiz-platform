@@ -1,0 +1,49 @@
+/**
+ * Database configuration and connection management
+ * Handles MongoDB connection with proper error handling and reconnection logic
+ */
+const mongoose = require('mongoose');
+
+class DatabaseConfig {
+  constructor() {
+    this.connectionString = process.env.MONGODB_URI || 'mongodb://localhost:27017/ai-quiz-platform';
+    this.options = {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      maxPoolSize: 10, // Maintain up to 10 socket connections
+      serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
+      socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+    };
+  }
+
+  async connect() {
+    try {
+      await mongoose.connect(this.connectionString, this.options);
+      console.log('📊 Database connected successfully');
+      
+      // Handle connection events
+      mongoose.connection.on('error', (err) => {
+        console.error('Database connection error:', err);
+      });
+      
+      mongoose.connection.on('disconnected', () => {
+        console.log('Database disconnected');
+      });
+      
+    } catch (error) {
+      console.error('Failed to connect to database:', error);
+      process.exit(1); // Exit if database connection fails
+    }
+  }
+
+  async disconnect() {
+    try {
+      await mongoose.disconnect();
+      console.log('Database disconnected gracefully');
+    } catch (error) {
+      console.error('Error disconnecting from database:', error);
+    }
+  }
+}
+
+module.exports = DatabaseConfig;
