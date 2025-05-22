@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Navigate to backend directory
+cd backend
+
+# Run linting and fix issues
+npm run lint:fix
+
+# Run formatting
+npm run format
+
+# Run tests to ensure nothing is broken
+npm test
+
+# Add any fixed files back to staging
+git add .

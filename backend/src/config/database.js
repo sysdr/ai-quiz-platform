@@ -1,7 +1,3 @@
-/**
- * Database configuration and connection management
- * Handles MongoDB connection with proper error handling and reconnection logic
- */
 const mongoose = require('mongoose');
 
 class DatabaseConfig {
@@ -10,9 +6,6 @@ class DatabaseConfig {
     this.options = {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      maxPoolSize: 10, // Maintain up to 10 socket connections
-      serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
-      socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
     };
   }
 
@@ -20,19 +13,9 @@ class DatabaseConfig {
     try {
       await mongoose.connect(this.connectionString, this.options);
       console.log('📊 Database connected successfully');
-      
-      // Handle connection events
-      mongoose.connection.on('error', (err) => {
-        console.error('Database connection error:', err);
-      });
-      
-      mongoose.connection.on('disconnected', () => {
-        console.log('Database disconnected');
-      });
-      
     } catch (error) {
       console.error('Failed to connect to database:', error);
-      process.exit(1); // Exit if database connection fails
+      throw error;
     }
   }
 

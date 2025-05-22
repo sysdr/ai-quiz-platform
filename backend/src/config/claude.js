@@ -18,7 +18,7 @@ class ClaudeConfig {
     
     // Default configuration for quiz generation
     this.defaultConfig = {
-      model: 'claude-3-sonnet-20240229',
+      model: 'claude-3-5-haiku-20241022',
       max_tokens: 1000,
       temperature: 0.7,
     };
@@ -38,14 +38,13 @@ class ClaudeConfig {
    */
   async validateConfiguration() {
     try {
-      // Make a simple test call to verify API access
       const response = await this.client.messages.create({
-        ...this.defaultConfig,
+        model: this.defaultConfig.model,
         max_tokens: 10,
         messages: [{ role: 'user', content: 'Hi' }]
       });
-      
-      return response && response.content;
+      console.info('Claude API configuration validation failed:', response);
+      return true;  // Return boolean, not response.content
     } catch (error) {
       console.error('Claude API configuration validation failed:', error);
       return false;
